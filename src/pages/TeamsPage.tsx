@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useTeams } from '@/hooks/useTeam';
+import { useTeams, useMyTeam } from '@/hooks/useTeam';
 import { useAvailableUsers } from '@/hooks/useUsers';
 import { useSendRecruitRequest } from '@/hooks/useRecruit';
 import { useAuthStatus } from '@/hooks/useAuth';
@@ -8,10 +8,12 @@ import { Input } from '@/components/ui/Input';
 import { Card, CardContent } from '@/components/ui/Card';
 import { TierBadge } from '@/components/ui/TierBadge';
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
+import { MAX_TEAM_SCORE } from '@/constants';
 
 export const TeamsPage: React.FC = () => {
   const { user } = useAuthStatus();
   const { data: teamsData, isLoading: teamsLoading } = useTeams();
+  const { data: myTeam } = useMyTeam();
   const { data: availableUsers, isLoading: usersLoading } = useAvailableUsers();
   const sendRecruitMutation = useSendRecruitRequest();
   
@@ -30,7 +32,18 @@ export const TeamsPage: React.FC = () => {
     (user.summonerName && user.summonerName.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
-  const handleRecruit = async (userId: number, userName: string) => {
+  const handleRecruit = async (userId: number, userName: string, userScore: number) => {
+    // 팀 점수 제한 확인
+    if (myTeam) {
+      const currentTeamScore = myTeam.totalScore;
+      const potentialNewScore = currentTeamScore + userScore;
+      
+      if (potentialNewScore > MAX_TEAM_SCORE) {
+        alert(`팀 점수가 ${MAX_TEAM_SCORE}점을 초과할 수 없습니다.\n현재 팀 점수: ${currentTeamScore}점\n${userName}님 점수: ${userScore}점\n예상 총 점수: ${potentialNewScore}점`);
+        return;
+      }
+    }
+
     if (window.confirm(`${userName}님에게 영입 요청을 보내시겠습니까?`)) {
       try {
         await sendRecruitMutation.mutateAsync({
@@ -203,7 +216,7 @@ export const TeamsPage: React.FC = () => {
                       {user?.teamName && (
                         <Button
                           size="sm"
-                          onClick={() => handleRecruit(player.id, player.name)}
+                          onClick={() => handleRecruit(player.id, player.name, player.score)}
                           loading={sendRecruitMutation.isPending}
                         >
                           영입

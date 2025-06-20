@@ -11,6 +11,9 @@ export const DEFAULT_RETRY_COUNT = 1;
 // Auth settings
 export const AUTH_TOKEN_EXPIRES_DAYS = 7;
 
+// Team settings
+export const MAX_TEAM_SCORE = 50;
+
 // UI pagination
 export const MAX_DISPLAYED_USERS = 10;
 export const MAX_PLAYERS_HEIGHT_CLASS = 'max-h-96';

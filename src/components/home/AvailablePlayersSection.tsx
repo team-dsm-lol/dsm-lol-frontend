@@ -1,11 +1,12 @@
 import React from 'react';
 import { useAvailableUsers } from '@/hooks/useUsers';
 import { useSendRecruitRequest } from '@/hooks/useRecruit';
+import { useMyTeam } from '@/hooks/useTeam';
 import { Button } from '@/components/ui/Button';
 import { Card, CardHeader, CardContent } from '@/components/ui/Card';
 import { TierBadge } from '@/components/ui/TierBadge';
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
-import { MAX_DISPLAYED_USERS, MAX_PLAYERS_HEIGHT_CLASS } from '@/constants';
+import { MAX_DISPLAYED_USERS, MAX_PLAYERS_HEIGHT_CLASS, MAX_TEAM_SCORE } from '@/constants';
 
 interface AvailablePlayersSectionProps {
   onRecruitSuccess?: () => void;
@@ -15,11 +16,23 @@ export const AvailablePlayersSection: React.FC<AvailablePlayersSectionProps> = (
   onRecruitSuccess,
 }) => {
   const { data: availableUsers, isLoading } = useAvailableUsers();
+  const { data: myTeam } = useMyTeam();
   const sendRecruitMutation = useSendRecruitRequest();
 
   const users = availableUsers?.users || [];
 
-  const handleRecruit = async (userId: number, userName: string) => {
+  const handleRecruit = async (userId: number, userName: string, userScore: number) => {
+    // 팀 점수 제한 확인
+    if (myTeam) {
+      const currentTeamScore = myTeam.totalScore;
+      const potentialNewScore = currentTeamScore + userScore;
+      
+      if (potentialNewScore > MAX_TEAM_SCORE) {
+        alert(`팀 점수가 ${MAX_TEAM_SCORE}점을 초과할 수 없습니다.\n현재 팀 점수: ${currentTeamScore}점\n${userName}님 점수: ${userScore}점\n예상 총 점수: ${potentialNewScore}점`);
+        return;
+      }
+    }
+
     if (window.confirm(`${userName}님에게 영입 요청을 보내시겠습니까?`)) {
       try {
         await sendRecruitMutation.mutateAsync({
@@ -87,7 +100,7 @@ export const AvailablePlayersSection: React.FC<AvailablePlayersSectionProps> = (
                   )}
                   <Button
                     size="sm"
-                    onClick={() => handleRecruit(user.id, user.name)}
+                    onClick={() => handleRecruit(user.id, user.name, user.score)}
                     loading={sendRecruitMutation.isPending}
                   >
                     영입

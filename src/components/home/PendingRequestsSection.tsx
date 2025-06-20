@@ -1,8 +1,10 @@
- import React from 'react';
+import React from 'react';
 import { useRespondToRecruitRequest } from '@/hooks/useRecruit';
+import { useAuthStatus } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/Button';
 import { Card, CardHeader, CardContent } from '@/components/ui/Card';
 import { TierBadge } from '@/components/ui/TierBadge';
+import { MAX_TEAM_SCORE } from '@/constants';
 import type { RecruitResponse } from '@/types/api';
 
 interface PendingRequestsSectionProps {
@@ -12,10 +14,22 @@ interface PendingRequestsSectionProps {
 export const PendingRequestsSection: React.FC<PendingRequestsSectionProps> = ({
   requests,
 }) => {
+  const { user } = useAuthStatus();
   const respondMutation = useRespondToRecruitRequest();
 
-  const handleResponse = async (requestId: number, accept: boolean, teamName: string) => {
+  const handleResponse = async (requestId: number, accept: boolean, teamName: string, teamScore: number) => {
     const action = accept ? '수락' : '거절';
+    
+    // 수락하는 경우 점수 제한 확인
+    if (accept && user) {
+      const potentialNewScore = teamScore + user.score;
+      
+      if (potentialNewScore > MAX_TEAM_SCORE) {
+        alert(`팀 점수가 ${MAX_TEAM_SCORE}점을 초과할 수 없습니다.\n${teamName} 팀 점수: ${teamScore}점\n나의 점수: ${user.score}점\n예상 총 점수: ${potentialNewScore}점`);
+        return;
+      }
+    }
+
     if (window.confirm(`${teamName} 팀의 영입 요청을 ${action}하시겠습니까?`)) {
       try {
         await respondMutation.mutateAsync({
@@ -79,7 +93,7 @@ export const PendingRequestsSection: React.FC<PendingRequestsSectionProps> = ({
               <div className="flex space-x-2">
                 <Button
                   size="sm"
-                  onClick={() => handleResponse(request.id, true, request.team.name)}
+                  onClick={() => handleResponse(request.id, true, request.team.name, request.team.totalScore)}
                   loading={respondMutation.isPending}
                   className="bg-toss-green hover:bg-green-600"
                 >
@@ -88,7 +102,7 @@ export const PendingRequestsSection: React.FC<PendingRequestsSectionProps> = ({
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => handleResponse(request.id, false, request.team.name)}
+                  onClick={() => handleResponse(request.id, false, request.team.name, request.team.totalScore)}
                   loading={respondMutation.isPending}
                   className="text-toss-red border-toss-red hover:bg-red-50"
                 >
