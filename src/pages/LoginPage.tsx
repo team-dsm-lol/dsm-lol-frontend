@@ -39,7 +39,7 @@ export const LoginPage: React.FC = () => {
         <div className="text-center mb-8">
           <div className="text-4xl font-bold text-white mb-2">🎮</div>
           <h1 className="text-3xl font-bold text-white mb-2">DSM LoL 멸망전</h1>
-          <p className="text-blue-100">대마고등학교 리그 오브 레전드 리그</p>
+          <p className="text-blue-100">DSM 롤 멸망전</p>
         </div>
 
         <Card>
@@ -47,7 +47,7 @@ export const LoginPage: React.FC = () => {
             <div>
               <Input
                 {...register('account_id')}
-                label="학번"
+                label="학교 계정 아이디"
                 placeholder="학교 계정 아이디를 입력하세요"
                 error={errors.account_id?.message}
                 autoComplete="username"
