@@ -22,6 +22,11 @@ const RANK_ORDER: Record<Rank, number> = {
   I: 4,
 };
 
+// 마스터 이상 티어인지 확인
+export const isMasterOrAbove = (tier: Tier): boolean => {
+  return TIER_ORDER[tier] >= TIER_ORDER.MASTER;
+};
+
 // 티어 한글 이름
 export const getTierKoreanName = (tier: Tier): string => {
   const tierNames: Record<Tier, string> = {

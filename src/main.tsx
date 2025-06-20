@@ -5,12 +5,13 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import { BrowserRouter } from 'react-router-dom'
 import App from './App.tsx'
 import './index.css'
+import { QUERY_STALE_TIME_MS, DEFAULT_RETRY_COUNT } from '@/constants'
 
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 5 * 60 * 1000, // 5분
-      retry: 1,
+      staleTime: QUERY_STALE_TIME_MS,
+      retry: DEFAULT_RETRY_COUNT,
     },
   },
 })

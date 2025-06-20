@@ -1,10 +1,10 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient, UseQueryResult } from '@tanstack/react-query';
 import { teamApi } from '@/services/api';
 import { handleApiError } from '@/lib/api';
-import type { TeamCreateRequest } from '@/types/api';
+import type { TeamCreateRequest, TeamListResponse, TeamResponse } from '@/types/api';
 
 // 모든 팀 조회 Hook
-export const useTeams = () => {
+export const useTeams = (): UseQueryResult<TeamListResponse, Error> => {
   return useQuery({
     queryKey: ['teams'],
     queryFn: async () => {
@@ -15,7 +15,7 @@ export const useTeams = () => {
 };
 
 // 내 팀 조회 Hook
-export const useMyTeam = () => {
+export const useMyTeam = (): UseQueryResult<TeamResponse, Error> => {
   return useQuery({
     queryKey: ['team', 'my'],
     queryFn: async () => {

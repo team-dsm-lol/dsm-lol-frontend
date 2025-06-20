@@ -1,5 +1,6 @@
 import axios, { AxiosInstance, AxiosResponse, InternalAxiosRequestConfig } from 'axios';
 import { getAuthToken, removeAuthToken, isValidToken } from '@/utils/auth';
+import { API_TIMEOUT_MS } from '@/constants';
 
 // API 기본 설정 - 환경변수 사용
 const BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://dsm-lol-server.xquare.app';
@@ -9,7 +10,7 @@ console.log('API Base URL:', BASE_URL);
 // Axios 인스턴스 생성
 export const apiClient: AxiosInstance = axios.create({
   baseURL: BASE_URL,
-  timeout: 10000,
+  timeout: API_TIMEOUT_MS,
   headers: {
     'Content-Type': 'application/json',
   },

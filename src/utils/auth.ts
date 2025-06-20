@@ -1,12 +1,13 @@
 import Cookies from 'js-cookie';
+import { AUTH_TOKEN_EXPIRES_DAYS } from '@/constants';
 
 const TOKEN_KEY = 'auth_token';
 
 // 토큰 저장
 export const setAuthToken = (token: string): void => {
   Cookies.set(TOKEN_KEY, token, { 
-    expires: 7, // 7일
-    secure: import.meta.env.PROD, // Vite 환경 변수 사용
+    expires: AUTH_TOKEN_EXPIRES_DAYS,
+    secure: import.meta.env.PROD, // Vite 환경변수 사용
     sameSite: 'strict'
   });
 };

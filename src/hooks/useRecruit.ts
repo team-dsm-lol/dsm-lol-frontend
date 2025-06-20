@@ -1,7 +1,7 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient, UseQueryResult } from '@tanstack/react-query';
 import { recruitApi } from '@/services/api';
 import { handleApiError } from '@/lib/api';
-import type { RecruitRequestDto, RecruitDecisionRequest } from '@/types/api';
+import type { RecruitRequestDto, RecruitDecisionRequest, RecruitListResponse } from '@/types/api';
 
 // 영입 요청 보내기 Hook
 export const useSendRecruitRequest = () => {
@@ -44,7 +44,7 @@ export const useRespondToRecruitRequest = () => {
 };
 
 // 팀에 온 영입 요청들 조회 Hook
-export const useTeamRecruitRequests = () => {
+export const useTeamRecruitRequests = (): UseQueryResult<RecruitListResponse, Error> => {
   return useQuery({
     queryKey: ['recruits', 'team'],
     queryFn: async () => {
@@ -55,7 +55,7 @@ export const useTeamRecruitRequests = () => {
 };
 
 // 나에게 온 영입 요청들 조회 Hook
-export const usePendingRequests = () => {
+export const usePendingRequests = (): UseQueryResult<RecruitListResponse, Error> => {
   return useQuery({
     queryKey: ['recruits', 'pending'],
     queryFn: async () => {
