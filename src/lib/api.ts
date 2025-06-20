@@ -1,8 +1,10 @@
 import axios, { AxiosInstance, AxiosResponse, InternalAxiosRequestConfig } from 'axios';
 import { getAuthToken, removeAuthToken, isValidToken } from '@/utils/auth';
 
-// API 기본 설정
-const BASE_URL = 'http://localhost:8080';
+// API 기본 설정 - 환경변수 사용
+const BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080';
+
+console.log('API Base URL:', BASE_URL);
 
 // Axios 인스턴스 생성
 export const apiClient: AxiosInstance = axios.create({

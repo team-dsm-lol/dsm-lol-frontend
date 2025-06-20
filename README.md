@@ -56,8 +56,16 @@ DSM LoL 멸망전은 대마고등학교 학생들을 위한 리그 오브 레전
 
 ### 설치
 ```bash
+# 저장소 클론
+git clone <repository-url>
+cd dsm-lol-league-frontend
+
 # 의존성 설치
 npm install
+
+# 환경변수 설정
+cp .env.example .env
+# .env 파일을 열어서 필요한 값들을 설정하세요
 
 # 개발 서버 실행
 npm run dev
@@ -69,11 +77,33 @@ npm run build
 npm run preview
 ```
 
-### 환경 변수
+### 환경 변수 설정
+
+프로젝트 루트에 `.env` 파일을 생성하고 다음 값들을 설정하세요:
+
 ```env
-# API 서버 URL (기본값: http://localhost:8080)
+# API 서버 URL (필수)
 VITE_API_BASE_URL=http://localhost:8080
 ```
+
+#### 환경별 설정 예시
+
+**개발 환경 (로컬)**
+```env
+VITE_API_BASE_URL=http://localhost:8080
+```
+
+**개발 환경 (네트워크)**
+```env
+VITE_API_BASE_URL=http://192.168.1.100:8080
+```
+
+**프로덕션 환경**
+```env
+VITE_API_BASE_URL=https://api.dsm-lol.com
+```
+
+> ⚠️ **주의**: Vite에서는 환경변수에 `VITE_` 접두사가 필요합니다. 이 접두사가 없으면 클라이언트 사이드에서 접근할 수 없습니다.
 
 ## 프로젝트 구조
 
@@ -166,6 +196,29 @@ src/
 - **모바일 우선** 반응형 디자인
 - **하단 네비게이션** (모바일)
 - **토스 스타일** 둥근 모서리 및 그림자
+
+## 배포
+
+### Vercel 배포
+```bash
+# Vercel CLI 설치
+npm i -g vercel
+
+# 배포
+vercel --prod
+
+# 환경 변수 설정
+vercel env add VITE_API_BASE_URL
+```
+
+### Netlify 배포
+```bash
+# 빌드
+npm run build
+
+# dist 폴더를 Netlify에 업로드
+# 환경 변수를 Netlify 대시보드에서 설정
+```
 
 ## 라이센스
 
