@@ -2,7 +2,7 @@
 export const NAVIGATION_DELAY_MS = 100;
 
 // API timeouts
-export const API_TIMEOUT_MS = 10000;
+export const API_TIMEOUT_MS = 1000000;
 
 // Cache settings
 export const QUERY_STALE_TIME_MS = 5 * 60 * 1000; // 5분
