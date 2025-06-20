@@ -16,7 +16,7 @@ export const useLogin = () => {
       const response = await userApi.login(data);
       return response;
     },
-    onSuccess: (response) => {
+    onSuccess: async (response) => {
       console.log('로그인 응답:', response);
       
       if (response.success && response.data?.token) {
@@ -26,11 +26,41 @@ export const useLogin = () => {
         // 쿼리 캐시 무효화
         queryClient.invalidateQueries({ queryKey: ['user', 'me'] });
         
-        console.log('Riot 등록 페이지로 이동...');
-        // 약간의 지연 후 이동 (상태 업데이트 시간 확보)
-        setTimeout(() => {
-          navigate('/riot-register', { replace: true });
-        }, 100);
+        try {
+          // 로그인 후 사용자 정보 조회
+          console.log('사용자 정보 조회 중...');
+          const userInfoResponse = await userApi.getMyInfo();
+          
+          if (userInfoResponse.success && userInfoResponse.data) {
+            const user = userInfoResponse.data;
+            console.log('사용자 정보:', user);
+            
+            // 티어 정보가 있는지 확인 (summonerName이 있으면 Riot 연동됨)
+            if (user.summonerName && user.tier) {
+              console.log('Riot 연동 완료된 사용자, 홈으로 이동...');
+              setTimeout(() => {
+                navigate('/', { replace: true });
+              }, 100);
+            } else {
+              console.log('Riot 연동 필요한 사용자, Riot 등록 페이지로 이동...');
+              setTimeout(() => {
+                navigate('/riot-register', { replace: true });
+              }, 100);
+            }
+          } else {
+            console.error('사용자 정보 조회 실패:', userInfoResponse);
+            // 실패시 기본적으로 Riot 등록 페이지로
+            setTimeout(() => {
+              navigate('/riot-register', { replace: true });
+            }, 100);
+          }
+        } catch (error) {
+          console.error('사용자 정보 조회 중 오류:', error);
+          // 오류시 기본적으로 Riot 등록 페이지로
+          setTimeout(() => {
+            navigate('/riot-register', { replace: true });
+          }, 100);
+        }
       } else {
         console.error('로그인 응답이 예상과 다름:', response);
       }
@@ -109,7 +139,8 @@ export const useAuthStatus = () => {
     isLoading,
     error,
     isLoggedIn: !!user,
-    needsRiotRegister: user && !user.summonerName,
+    // Riot 연동 필요 조건: 사용자는 있지만 summonerName이나 tier가 없는 경우
+    needsRiotRegister: user && (!user.summonerName || !user.tier),
   };
   
   console.log('인증 상태:', status);
