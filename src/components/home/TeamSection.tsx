@@ -17,7 +17,7 @@ const NoTeamSection: React.FC = () => {
   return (
     <Card>
       <CardHeader>
-        <h2 className="text-xl font-bold text-toss-gray-900">팀 생성</h2>
+        <h2 className="text-xl font-bold text-toss-gray-900">팀 생성 (팀원으로 참가하는 경우 팀을 생성하지 말아주세요.)</h2>
       </CardHeader>
       <CardContent>
         <p className="text-toss-gray-600 mb-4">
