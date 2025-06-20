@@ -47,7 +47,7 @@ export const ProfilePage: React.FC = () => {
               </div>
               <div>
                 <label className="block text-sm font-medium text-toss-gray-600 mb-1">
-                  학번
+                  계정 아이디
                 </label>
                 <p className="text-lg font-medium text-toss-gray-900">{user.accountId}</p>
               </div>
