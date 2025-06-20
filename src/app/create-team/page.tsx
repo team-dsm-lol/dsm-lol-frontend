@@ -9,6 +9,7 @@ import { teamApi } from '@/lib/api';
 import { useTeamStore } from '@/store/teamStore';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
+import AuthGuard from '@/components/AuthGuard';
 import type { TeamCreateRequest } from '@/types/api';
 
 type TeamFormData = TeamCreateRequest;
@@ -57,22 +58,23 @@ const CreateTeamPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <header className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center h-16">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleBack}
-              className="mr-4"
-            >
-              <ArrowLeft className="h-4 w-4" />
-            </Button>
-            <h1 className="text-xl font-bold text-gray-900">팀 생성</h1>
+    <AuthGuard>
+      <div className="min-h-screen bg-gray-50">
+        <header className="bg-white shadow-sm border-b">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex items-center h-16">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleBack}
+                className="mr-4"
+              >
+                <ArrowLeft className="h-4 w-4" />
+              </Button>
+              <h1 className="text-xl font-bold text-gray-900">팀 생성</h1>
+            </div>
           </div>
-        </div>
-      </header>
+        </header>
 
       <main className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="bg-white rounded-lg shadow-sm border p-8">
@@ -147,6 +149,7 @@ const CreateTeamPage: React.FC = () => {
         </div>
       </main>
     </div>
+    </AuthGuard>
   );
 };
 

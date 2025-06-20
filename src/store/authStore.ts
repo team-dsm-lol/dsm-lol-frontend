@@ -56,4 +56,9 @@ export const useAuthStore = create<AuthState>((set) => ({
     set({ isAuthenticated: isAuth });
     return isAuth;
   }
-})); 
+}));
+
+// 전역에서 사용할 수 있는 logout 함수 export
+export const globalLogout = () => {
+  useAuthStore.getState().logout();
+}; 

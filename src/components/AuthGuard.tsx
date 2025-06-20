@@ -39,8 +39,9 @@ const AuthGuard: React.FC<AuthGuardProps> = ({ children }) => {
         
         if (!hasToken) {
           console.log('AuthGuard: 토큰 없음, 로그인 페이지로 이동');
+          logout(); // 상태 초기화
           setLoading(false);
-          router.push('/login');
+          router.replace('/login'); // push 대신 replace 사용
           return;
         }
 
@@ -58,7 +59,8 @@ const AuthGuard: React.FC<AuthGuardProps> = ({ children }) => {
             // 토큰이 유효하지 않은 경우
             console.log('AuthGuard: 토큰 유효하지 않음, 로그아웃');
             logout();
-            router.push('/login');
+            setLoading(false);
+            router.replace('/login');
           }
         } catch (apiError) {
           console.error('AuthGuard: API 호출 실패:', apiError);
@@ -74,12 +76,14 @@ const AuthGuard: React.FC<AuthGuardProps> = ({ children }) => {
           
           // 인증 오류인 경우 로그인 페이지로 이동
           logout();
-          router.push('/login');
+          setLoading(false);
+          router.replace('/login');
         }
       } catch (error) {
         console.error('Auth initialization error:', error);
         logout();
-        router.push('/login');
+        setLoading(false);
+        router.replace('/login');
       }
     };
 

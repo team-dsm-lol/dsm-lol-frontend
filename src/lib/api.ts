@@ -14,8 +14,9 @@ import type {
   RecruitDecisionRequest,
   Tier
 } from '@/types/api';
+import { globalLogout } from '@/store/authStore';
 
-const BASE_URL = 'http://192.168.1.5:8080';
+const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8080';
 
 // Create axios instance
 const api = axios.create({
@@ -64,8 +65,14 @@ api.interceptors.response.use(
   (response) => response,
   (error: AxiosError) => {
     if (error.response?.status === 401) {
+      console.log('API: 401 Unauthorized - 토큰이 유효하지 않음');
       setAuthToken(null);
-      window.location.href = '/login';
+      globalLogout();
+      
+      // 현재 페이지가 로그인 페이지가 아닌 경우에만 리다이렉트
+      if (typeof window !== 'undefined' && !window.location.pathname.includes('/login')) {
+        window.location.replace('/login');
+      }
     }
     return Promise.reject(error);
   }

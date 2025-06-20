@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
@@ -17,9 +17,18 @@ type RiotFormData = RiotAccountRequest;
 
 const LoginPage: React.FC = () => {
   const router = useRouter();
-  const { login, setUser } = useAuthStore();
+  const { login, setUser, isAuthenticated, checkAuth } = useAuthStore();
   const [step, setStep] = useState<'school' | 'riot'>('school');
   const [isLoading, setIsLoading] = useState(false);
+
+  // 이미 인증된 사용자가 로그인 페이지에 접근했을 때 메인 페이지로 리다이렉트
+  useEffect(() => {
+    const token = checkAuth();
+    if (token && isAuthenticated) {
+      console.log('LoginPage: 이미 인증된 사용자, 메인 페이지로 리다이렉트');
+      router.replace('/');
+    }
+  }, [isAuthenticated, checkAuth, router]);
 
   // 학교 로그인 폼
   const {
