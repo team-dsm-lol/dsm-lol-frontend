@@ -48,7 +48,7 @@ export const LoginPage: React.FC = () => {
               <Input
                 {...register('account_id')}
                 label="학번"
-                placeholder="학번을 입력하세요"
+                placeholder="학교 계정 아이디를 입력하세요"
                 error={errors.account_id?.message}
                 autoComplete="username"
               />
