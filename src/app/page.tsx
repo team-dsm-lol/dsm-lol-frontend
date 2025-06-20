@@ -22,11 +22,11 @@ import UserCard from '@/components/UserCard';
 import TeamCard from '@/components/TeamCard';
 import AuthGuard from '@/components/AuthGuard';
 import { formatTierRank, getTierColor, getScoreColor } from '@/lib/utils';
-import type { UserResponse, Tier } from '@/types/api';
+import type { Tier } from '@/types/api';
 
 const HomePage: React.FC = () => {
   const router = useRouter();
-  const { user, isAuthenticated, logout, setUser, setLoading } = useAuthStore();
+  const { user, isAuthenticated, logout } = useAuthStore();
   const { myTeam, allTeams, availableUsers, setMyTeam, setAllTeams, setAvailableUsers } = useTeamStore();
   
   const [searchTerm, setSearchTerm] = useState('');
@@ -101,7 +101,7 @@ const HomePage: React.FC = () => {
     };
 
     loadInitialData();
-  }, [isAuthenticated, user]); // user가 설정된 후에 실행
+  }, [isAuthenticated, user, setMyTeam, setAllTeams, setAvailableUsers]); // user가 설정된 후에 실행
 
   // 검색 및 필터링된 사용자 목록
   const filteredUsers = availableUsers.filter(user => {

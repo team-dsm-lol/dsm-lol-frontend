@@ -60,11 +60,12 @@ const AuthGuard: React.FC<AuthGuardProps> = ({ children }) => {
             logout();
             router.push('/login');
           }
-        } catch (apiError: any) {
+        } catch (apiError) {
           console.error('AuthGuard: API 호출 실패:', apiError);
           
           // 네트워크 오류인지 확인 (백엔드 서버가 꺼져있는 경우)
-          if (apiError.code === 'ECONNREFUSED' || apiError.message?.includes('Network Error') || apiError.code === 'ERR_NETWORK') {
+          const axiosError = apiError as { code?: string; message?: string };
+          if (axiosError.code === 'ECONNREFUSED' || axiosError.message?.includes('Network Error') || axiosError.code === 'ERR_NETWORK') {
             console.log('AuthGuard: 백엔드 서버에 연결할 수 없음');
             setConnectionError(true);
             setLoading(false);
@@ -83,6 +84,7 @@ const AuthGuard: React.FC<AuthGuardProps> = ({ children }) => {
     };
 
     initAuth();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []); // 의존성 배열을 빈 배열로 변경하여 한 번만 실행
 
   // 연결 오류가 발생한 경우

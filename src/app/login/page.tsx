@@ -9,11 +9,11 @@ import { userApi } from '@/lib/api';
 import { useAuthStore } from '@/store/authStore';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
-import type { SchoolLoginRequest, RiotAccountRequest } from '@/types/api';
+import type { SchoolLoginRequest, RiotAccountRequest, UserResponse } from '@/types/api';
 
-interface LoginFormData extends SchoolLoginRequest {}
+type LoginFormData = SchoolLoginRequest;
 
-interface RiotFormData extends RiotAccountRequest {}
+type RiotFormData = RiotAccountRequest;
 
 const LoginPage: React.FC = () => {
   const router = useRouter();
@@ -43,14 +43,15 @@ const LoginPage: React.FC = () => {
       console.log('로그인 응답:', response);
       
       if (response.success && response.data) {
-                 // API 문서에 따르면 data는 Map<String, String> 형태
-         const token = response.data.access_token || (response.data as any).token || (response.data as any).accessToken;
+                         // API 문서에 따르면 data는 Map<String, String> 형태
+        const tokenData = response.data as { access_token?: string; token?: string; accessToken?: string };
+        const token = tokenData.access_token || tokenData.token || tokenData.accessToken;
         
         if (token) {
           console.log('토큰 받음:', token);
           
           // 먼저 토큰을 설정
-          login(token, null as any); // 임시로 null 전달
+          login(token, {} as UserResponse); // 임시로 빈 객체 전달
           
           // 토큰 설정 후 사용자 정보 가져오기
           try {
@@ -83,13 +84,14 @@ const LoginPage: React.FC = () => {
       } else {
         toast.error(response.message || '로그인에 실패했습니다.');
       }
-    } catch (error: any) {
+    } catch (error) {
       console.error('Login error:', error);
       
       // 네트워크 연결 오류 처리
-      if (error.code === 'ECONNREFUSED' || error.message?.includes('Network Error') || error.code === 'ERR_NETWORK') {
+      const axiosError = error as { code?: string; message?: string; response?: { status?: number } };
+      if (axiosError.code === 'ECONNREFUSED' || axiosError.message?.includes('Network Error') || axiosError.code === 'ERR_NETWORK') {
         toast.error('서버에 연결할 수 없습니다. 백엔드 서버가 실행 중인지 확인해주세요.');
-      } else if (error.response?.status === 401) {
+      } else if (axiosError.response?.status === 401) {
         toast.error('로그인 정보가 올바르지 않습니다.');
       } else {
         toast.error('로그인 중 오류가 발생했습니다.');
@@ -180,7 +182,7 @@ const LoginPage: React.FC = () => {
           ) : (
             <form className="mt-8 space-y-6" onSubmit={handleRiotSubmit(onRiotRegister)}>
               <div className="text-sm text-gray-600 bg-blue-50 p-4 rounded-lg">
-                <p>예시: gameName은 "Hide on bush", tagLine은 "KR1"</p>
+                <p>예시: gameName은 &quot;Hide on bush&quot;, tagLine은 &quot;KR1&quot;</p>
                 <p>소환사명#태그 형태로 입력해주세요.</p>
               </div>
 

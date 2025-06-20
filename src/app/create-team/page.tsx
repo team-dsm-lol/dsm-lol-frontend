@@ -11,7 +11,7 @@ import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
 import type { TeamCreateRequest } from '@/types/api';
 
-interface TeamFormData extends TeamCreateRequest {}
+type TeamFormData = TeamCreateRequest;
 
 const CreateTeamPage: React.FC = () => {
   const router = useRouter();
@@ -35,14 +35,15 @@ const CreateTeamPage: React.FC = () => {
       } else {
         toast.error(response.message || '팀 생성에 실패했습니다.');
       }
-    } catch (error: any) {
+    } catch (error) {
       console.error('Team creation error:', error);
       
       // 네트워크 연결 오류 처리
-      if (error.code === 'ECONNREFUSED' || error.message?.includes('Network Error') || error.code === 'ERR_NETWORK') {
+      const axiosError = error as { code?: string; message?: string; response?: { status?: number; data?: { message?: string } } };
+      if (axiosError.code === 'ECONNREFUSED' || axiosError.message?.includes('Network Error') || axiosError.code === 'ERR_NETWORK') {
         toast.error('서버에 연결할 수 없습니다. 백엔드 서버가 실행 중인지 확인해주세요.');
-      } else if (error.response?.status === 400) {
-        toast.error(error.response?.data?.message || '팀 생성에 실패했습니다.');
+      } else if (axiosError.response?.status === 400) {
+        toast.error(axiosError.response?.data?.message || '팀 생성에 실패했습니다.');
       } else {
         toast.error('팀 생성 중 오류가 발생했습니다.');
       }
