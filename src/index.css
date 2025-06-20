@@ -1,0 +1,53 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    @apply border-gray-200;
+  }
+  body {
+    @apply bg-gray-50 text-gray-900 font-pretendard;
+  }
+}
+
+/* 토스 스타일 커스텀 컴포넌트 */
+@layer components {
+  .btn-primary {
+    @apply bg-toss-blue text-white font-medium rounded-xl px-6 py-3 transition-all duration-200 hover:bg-blue-600 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+  
+  .btn-secondary {
+    @apply bg-toss-gray-100 text-toss-gray-700 font-medium rounded-xl px-6 py-3 transition-all duration-200 hover:bg-toss-gray-200 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+  
+  .input-field {
+    @apply w-full px-4 py-3 border border-toss-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-toss-blue focus:border-transparent transition-all duration-200;
+  }
+  
+  .card {
+    @apply bg-white rounded-2xl p-6 shadow-toss border border-toss-gray-100;
+  }
+  
+  .tier-badge {
+    @apply inline-flex items-center px-2 py-1 rounded-lg text-xs font-medium;
+  }
+}
+
+/* 스크롤바 스타일링 */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f3f4;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #c1c8cd;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #a8b3ba;
+} 

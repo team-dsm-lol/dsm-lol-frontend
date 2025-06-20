@@ -1,190 +1,85 @@
-import axios, { AxiosError } from 'axios';
-import type {
-  ApiResponse,
-  UserResponse,
-  UserListResponse,
-  TeamResponse,
-  TeamListResponse,
-  RecruitResponse,
-  RecruitListResponse,
-  SchoolLoginRequest,
-  RiotAccountRequest,
-  TeamCreateRequest,
-  RecruitRequestDto,
-  RecruitDecisionRequest,
-  Tier
-} from '@/types/api';
-import { globalLogout } from '@/store/authStore';
+import axios, { AxiosInstance, AxiosResponse, InternalAxiosRequestConfig } from 'axios';
+import { getAuthToken, removeAuthToken, isValidToken } from '@/utils/auth';
 
-const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8080';
+// API 기본 설정
+const BASE_URL = 'http://localhost:8080';
 
-// Create axios instance
-const api = axios.create({
+// Axios 인스턴스 생성
+export const apiClient: AxiosInstance = axios.create({
   baseURL: BASE_URL,
   timeout: 10000,
+  headers: {
+    'Content-Type': 'application/json',
+  },
 });
 
-// Token management
-let accessToken: string | null = null;
-
-export const setAuthToken = (token: string | null) => {
-  accessToken = token;
-  if (token) {
-    api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-    localStorage.setItem('accessToken', token);
-  } else {
-    delete api.defaults.headers.common['Authorization'];
-    localStorage.removeItem('accessToken');
-  }
-};
-
-export const getAuthToken = (): string | null => {
-  if (accessToken) return accessToken;
-  
-  if (typeof window !== 'undefined') {
-    const token = localStorage.getItem('accessToken');
-    if (token) {
-      setAuthToken(token);
-      return token;
+// 요청 인터셉터 - 인증 토큰 자동 추가
+apiClient.interceptors.request.use(
+  (config: InternalAxiosRequestConfig) => {
+    const token = getAuthToken();
+    
+    // 토큰이 있고 유효한 경우 헤더에 추가
+    if (token && isValidToken()) {
+      config.headers.Authorization = `Bearer ${token}`;
     }
-  }
-  
-  return null;
-};
-
-// Initialize token on startup
-if (typeof window !== 'undefined') {
-  const token = localStorage.getItem('accessToken');
-  if (token) {
-    setAuthToken(token);
-  }
-}
-
-// Response interceptor for error handling
-api.interceptors.response.use(
-  (response) => response,
-  (error: AxiosError) => {
-    if (error.response?.status === 401) {
-      console.log('API: 401 Unauthorized - 토큰이 유효하지 않음');
-      setAuthToken(null);
-      globalLogout();
-      
-      // 현재 페이지가 로그인 페이지가 아닌 경우에만 리다이렉트
-      if (typeof window !== 'undefined' && !window.location.pathname.includes('/login')) {
-        window.location.replace('/login');
-      }
-    }
+    
+    return config;
+  },
+  (error) => {
     return Promise.reject(error);
   }
 );
 
-// User API
-export const userApi = {
-  // 학교 계정 로그인
-  login: async (data: SchoolLoginRequest): Promise<ApiResponse<{ access_token: string }>> => {
-    const response = await api.post('/api/users/login', data);
-    return response.data;
+// 응답 인터셉터 - 에러 처리
+apiClient.interceptors.response.use(
+  (response: AxiosResponse) => {
+    return response;
   },
+  (error) => {
+    // 401 에러 (인증 실패) 처리
+    if (error.response?.status === 401) {
+      removeAuthToken();
+      window.location.href = '/login';
+      return;
+    }
+    
+    // 네트워크 에러 처리
+    if (!error.response) {
+      console.error('Network error:', error.message);
+      // 필요시 사용자에게 네트워크 에러 알림
+    }
+    
+    return Promise.reject(error);
+  }
+);
 
-  // Riot 계정 연동
-  registerRiot: async (data: RiotAccountRequest): Promise<ApiResponse<UserResponse>> => {
-    const response = await api.post('/api/users/register-riot', data);
-    return response.data;
-  },
+// API 에러 타입
+export interface ApiError {
+  message: string;
+  status?: number;
+  code?: string;
+}
 
-  // 내 정보 조회
-  getMyInfo: async (): Promise<ApiResponse<UserResponse>> => {
-    const response = await api.get('/api/users/me');
-    return response.data;
-  },
-
-  // 사용자 목록 조회
-  getAllUsers: async (params?: {
-    tier?: Tier;
-    name?: string;
-    hasTeam?: boolean;
-  }): Promise<ApiResponse<UserListResponse>> => {
-    const response = await api.get('/api/users', { params });
-    return response.data;
-  },
-
-  // 영입 가능한 사용자 조회
-  getAvailableUsers: async (params?: {
-    tier?: Tier;
-    name?: string;
-  }): Promise<ApiResponse<UserListResponse>> => {
-    const response = await api.get('/api/users/available', { params });
-    return response.data;
-  },
+// API 에러 처리 유틸리티
+export const handleApiError = (error: any): ApiError => {
+  if (error.response) {
+    // 서버가 응답을 반환한 경우
+    return {
+      message: error.response.data?.message || '서버 오류가 발생했습니다.',
+      status: error.response.status,
+      code: error.response.data?.code,
+    };
+  } else if (error.request) {
+    // 요청이 전송되었지만 응답을 받지 못한 경우
+    return {
+      message: '서버에 연결할 수 없습니다. 네트워크를 확인해주세요.',
+    };
+  } else {
+    // 요청 설정 중 오류가 발생한 경우
+    return {
+      message: error.message || '알 수 없는 오류가 발생했습니다.',
+    };
+  }
 };
 
-// Team API
-export const teamApi = {
-  // 팀 생성
-  createTeam: async (data: TeamCreateRequest): Promise<ApiResponse<TeamResponse>> => {
-    const response = await api.post('/api/teams', data);
-    return response.data;
-  },
-
-  // 모든 팀 조회
-  getAllTeams: async (): Promise<ApiResponse<TeamListResponse>> => {
-    const response = await api.get('/api/teams');
-    return response.data;
-  },
-
-  // 특정 팀 조회
-  getTeamById: async (teamId: number): Promise<ApiResponse<TeamResponse>> => {
-    const response = await api.get(`/api/teams/${teamId}`);
-    return response.data;
-  },
-
-  // 내 팀 조회
-  getMyTeam: async (): Promise<ApiResponse<TeamResponse>> => {
-    const response = await api.get('/api/teams/my-team');
-    return response.data;
-  },
-
-  // 팀 탈퇴
-  leaveTeam: async (): Promise<ApiResponse<string>> => {
-    const response = await api.post('/api/teams/leave');
-    return response.data;
-  },
-
-  // 팀원 강퇴
-  kickMember: async (userId: number): Promise<ApiResponse<string>> => {
-    const response = await api.post(`/api/teams/kick/${userId}`);
-    return response.data;
-  },
-};
-
-// Recruit API
-export const recruitApi = {
-  // 영입 요청 보내기
-  sendRecruitRequest: async (data: RecruitRequestDto): Promise<ApiResponse<RecruitResponse>> => {
-    const response = await api.post('/api/recruits', data);
-    return response.data;
-  },
-
-  // 영입 요청에 응답
-  respondToRecruitRequest: async (
-    requestId: number, 
-    data: RecruitDecisionRequest
-  ): Promise<ApiResponse<string>> => {
-    const response = await api.post(`/api/recruits/${requestId}/respond`, data);
-    return response.data;
-  },
-
-  // 팀에 온 영입 요청들 조회
-  getTeamRecruitRequests: async (): Promise<ApiResponse<RecruitListResponse>> => {
-    const response = await api.get('/api/recruits/team-requests');
-    return response.data;
-  },
-
-  // 나에게 온 영입 요청들 조회
-  getPendingRequests: async (): Promise<ApiResponse<RecruitListResponse>> => {
-    const response = await api.get('/api/recruits/pending');
-    return response.data;
-  },
-};
-
-export default api; 
+export default apiClient; 

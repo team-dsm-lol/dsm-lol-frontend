@@ -1,27 +1,33 @@
-// API Response Types
-export interface ApiResponse<T = unknown> {
+// 공통 API 응답 타입
+export interface ApiResponse<T> {
   success: boolean;
   message: string;
-  data?: T;
+  data: T;
 }
 
-// User Types
+// 티어 타입
 export type Tier = 
-  | "IRON" 
-  | "BRONZE" 
-  | "SILVER" 
-  | "GOLD" 
-  | "PLATINUM" 
-  | "EMERALD" 
-  | "DIAMOND" 
-  | "MASTER" 
-  | "GRANDMASTER" 
-  | "CHALLENGER";
+  | 'IRON'
+  | 'BRONZE'
+  | 'SILVER'
+  | 'GOLD'
+  | 'PLATINUM'
+  | 'EMERALD'
+  | 'DIAMOND'
+  | 'MASTER'
+  | 'GRANDMASTER'
+  | 'CHALLENGER';
 
-export type Rank = "IV" | "III" | "II" | "I";
+// 랭크 타입
+export type Rank = 'IV' | 'III' | 'II' | 'I';
 
-export type UserRole = "SCH" | "STU" | "DOR";
+// 사용자 역할 타입
+export type UserRole = 'SCH' | 'STU' | 'DOR';
 
+// 영입 상태 타입
+export type RecruitStatus = 'PENDING' | 'ACCEPTED' | 'REJECTED';
+
+// 사용자 타입
 export interface UserResponse {
   id: number;
   accountId: string;
@@ -39,12 +45,7 @@ export interface UserResponse {
   isTeamLeader: boolean;
 }
 
-export interface UserListResponse {
-  users: UserResponse[];
-  totalCount: number;
-}
-
-// Team Types
+// 팀 타입
 export interface TeamResponse {
   id: number;
   name: string;
@@ -56,14 +57,7 @@ export interface TeamResponse {
   createdAt: string;
 }
 
-export interface TeamListResponse {
-  teams: TeamResponse[];
-  totalCount: number;
-}
-
-// Recruit Types
-export type RecruitStatus = "PENDING" | "ACCEPTED" | "REJECTED";
-
+// 영입 요청 타입
 export interface RecruitResponse {
   id: number;
   team: TeamResponse;
@@ -74,12 +68,12 @@ export interface RecruitResponse {
   createdAt: string;
 }
 
-export interface RecruitListResponse {
-  requests: RecruitResponse[];
-  totalCount: number;
+// 로그인 응답 타입 (실제 API 응답에 맞게 수정)
+export interface LoginResponse {
+  token: string;
 }
 
-// Request Types
+// 요청 타입들
 export interface SchoolLoginRequest {
   account_id: string;
   password: string;
@@ -102,4 +96,20 @@ export interface RecruitRequestDto {
 
 export interface RecruitDecisionRequest {
   accept: boolean;
+}
+
+// 리스트 응답 타입들
+export interface UserListResponse {
+  users: UserResponse[];
+  totalCount: number;
+}
+
+export interface TeamListResponse {
+  teams: TeamResponse[];
+  totalCount: number;
+}
+
+export interface RecruitListResponse {
+  requests: RecruitResponse[];
+  totalCount: number;
 } 
