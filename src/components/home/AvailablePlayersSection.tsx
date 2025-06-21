@@ -8,6 +8,18 @@ import { TierBadge } from '@/components/ui/TierBadge';
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 import { MAX_DISPLAYED_USERS, MAX_PLAYERS_HEIGHT_CLASS, MAX_TEAM_SCORE } from '@/constants';
 
+// 라인 이름 매핑 함수 추가
+const getLaneName = (lane: string | undefined): string => {
+  const laneMap: Record<string, string> = {
+    'TOP': '탑',
+    'JUNGLE': '정글',
+    'MID': '미드',
+    'ADC': '원딜',
+    'SUPPORT': '서포터',
+  };
+  return lane ? laneMap[lane] || lane : '-';
+};
+
 interface AvailablePlayersSectionProps {
   onRecruitSuccess?: () => void;
 }
@@ -86,6 +98,23 @@ export const AvailablePlayersSection: React.FC<AvailablePlayersSectionProps> = (
                     <div className="text-sm text-toss-gray-600">
                       점수: {user.score}점
                     </div>
+                    {(user.mostLane || user.secondLane) && (
+                      <div className="flex items-center space-x-2 mt-1">
+                        <span className="text-sm text-toss-gray-600">라인:</span>
+                        <div className="flex space-x-1">
+                          {user.mostLane && (
+                            <span className="px-2 py-1 bg-toss-blue bg-opacity-10 text-toss-blue text-xs rounded-md font-medium">
+                              {getLaneName(user.mostLane)}
+                            </span>
+                          )}
+                          {user.secondLane && (
+                            <span className="px-2 py-1 bg-toss-gray-100 text-toss-gray-700 text-xs rounded-md font-medium">
+                              {getLaneName(user.secondLane)}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
 
