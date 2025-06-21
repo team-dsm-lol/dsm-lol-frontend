@@ -10,6 +10,18 @@ import { TierBadge } from '@/components/ui/TierBadge';
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 import { MAX_TEAM_SCORE } from '@/constants';
 
+// 라인 이름 매핑 함수 추가
+const getLaneName = (lane: string | undefined): string => {
+  const laneMap: Record<string, string> = {
+    'TOP': '탑',
+    'JUNGLE': '정글',
+    'MID': '미드',
+    'ADC': '원딜',
+    'SUPPORT': '서포터',
+  };
+  return lane ? laneMap[lane] || lane : '-';
+};
+
 export const TeamsPage: React.FC = () => {
   const { user } = useAuthStatus();
   const { data: teamsData, isLoading: teamsLoading } = useTeams();
@@ -202,6 +214,23 @@ export const TeamsPage: React.FC = () => {
                         <p className="text-sm text-toss-gray-600">
                           점수: {player.score}점
                         </p>
+                        {(player.mostLane || player.secondLane) && (
+                          <div className="flex items-center space-x-2 mt-1">
+                            <span className="text-sm text-toss-gray-600">라인:</span>
+                            <div className="flex space-x-1">
+                              {player.mostLane && (
+                                <span className="px-2 py-1 bg-toss-blue bg-opacity-10 text-toss-blue text-xs rounded-md font-medium">
+                                  {getLaneName(player.mostLane)}
+                                </span>
+                              )}
+                              {player.secondLane && (
+                                <span className="px-2 py-1 bg-toss-gray-100 text-toss-gray-700 text-xs rounded-md font-medium">
+                                  {getLaneName(player.secondLane)}
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                        )}
                       </div>
                     </div>
 

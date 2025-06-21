@@ -1,15 +1,30 @@
 import React from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useRiotRegister } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
+import { Select } from '@/components/ui/Select';
 import { Card, CardHeader, CardContent } from '@/components/ui/Card';
+
+const LANE_OPTIONS = [
+  { value: 'TOP', label: '탑' },
+  { value: 'JUNGLE', label: '정글' },
+  { value: 'MID', label: '미드' },
+  { value: 'ADC', label: '원딜' },
+  { value: 'SUPPORT', label: '서포터' },
+];
 
 const riotSchema = z.object({
   gameName: z.string().min(1, 'Riot ID를 입력해주세요'),
   tagLine: z.string().min(1, '태그를 입력해주세요'),
+  mostLane: z.enum(['TOP', 'JUNGLE', 'MID', 'ADC', 'SUPPORT'], {
+    errorMap: () => ({ message: '모스트 라인을 선택해주세요' })
+  }),
+  secondLane: z.enum(['TOP', 'JUNGLE', 'MID', 'ADC', 'SUPPORT'], {
+    errorMap: () => ({ message: '세컨 라인을 선택해주세요' })
+  }),
   summonerName: z.string().optional(),
 });
 
@@ -20,6 +35,7 @@ export const RiotRegisterPage: React.FC = () => {
   
   const {
     register,
+    control,
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm<RiotFormData>({
@@ -69,6 +85,42 @@ export const RiotRegisterPage: React.FC = () => {
                   placeholder="KR1"
                   error={errors.tagLine?.message}
                   helperText="# 뒤의 태그를 입력하세요"
+                />
+              </div>
+
+              <div>
+                <Controller
+                  name="mostLane"
+                  control={control}
+                  render={({ field }) => (
+                    <Select
+                      label="모스트 라인"
+                      placeholder="주 포지션을 선택하세요"
+                      value={field.value}
+                      options={LANE_OPTIONS}
+                      onChange={field.onChange}
+                      error={errors.mostLane?.message}
+                      required
+                    />
+                  )}
+                />
+              </div>
+
+              <div>
+                <Controller
+                  name="secondLane"
+                  control={control}
+                  render={({ field }) => (
+                    <Select
+                      label="세컨 라인"
+                      placeholder="보조 포지션을 선택하세요"
+                      value={field.value}
+                      options={LANE_OPTIONS}
+                      onChange={field.onChange}
+                      error={errors.secondLane?.message}
+                      required
+                    />
+                  )}
                 />
               </div>
 

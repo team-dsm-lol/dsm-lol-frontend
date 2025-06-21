@@ -5,6 +5,9 @@ export interface ApiResponse<T> {
   data: T;
 }
 
+// 라인 타입
+export type Lane = 'TOP' | 'JUNGLE' | 'MID' | 'ADC' | 'SUPPORT';
+
 // 티어 타입
 export type Tier = 
   | 'IRON'
@@ -40,7 +43,15 @@ export interface UserResponse {
   tier?: Tier;
   rank?: Rank;
   leaguePoints: number;
+  level?: number;
+  seasonHighestTier?: Tier;
+  seasonHighestRank?: Rank;
+  allTimeHighestTier?: Tier;
+  allTimeHighestRank?: Rank;
+  masteryBenefit?: number;
   score: number;
+  mostLane?: Lane;
+  secondLane?: Lane;
   teamName?: string;
   isTeamLeader: boolean;
 }
@@ -82,6 +93,8 @@ export interface SchoolLoginRequest {
 export interface RiotAccountRequest {
   gameName: string;
   tagLine: string;
+  mostLane: Lane;
+  secondLane: Lane;
   summonerName?: string;
 }
 
